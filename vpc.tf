@@ -70,7 +70,10 @@ resource "aws_network_acl" "main" {
   ingress {
     rule_no    = 100
     action     = "allow"
+    protocol   = "-1"
     cidr_block = aws_vpc.main.cidr_block
+    from_port  = 0
+    to_port    = 0
   }
 
   ingress {
@@ -86,7 +89,10 @@ resource "aws_network_acl" "main" {
   egress {
     rule_no    = 200
     action     = "allow"
+    protocol   = "-1"
     cidr_block = var.route_pub
+    from_port  = 0
+    to_port    = 0
   }
 
   egress {
