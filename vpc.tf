@@ -52,11 +52,13 @@ resource "aws_route_table" "priv_route" {
 }
 
 resource "aws_route_table_association" "public" {
+  count = 4
   subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.pub_route.id
 }
 
 resource "aws_route_table_association" "private" {
+  count = 4
   subnet_id      = aws_subnet.private_subnets[count.index].id
   route_table_id = aws_route_table.priv_route.id
 }
