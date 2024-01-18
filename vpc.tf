@@ -34,7 +34,7 @@ resource "aws_route_table" "pub_route" {
   vpc_id = aws_vpc.main.id
 
   route = {
-    cidr_block = var.route_pub
+    cidr_block = "0.0.0.0/0"
     internet_gateway_id = aws_internet_gateway.gw.id
   }
 
@@ -104,7 +104,7 @@ resource "aws_network_acl" "main" {
 }
 
 # Associate NACL with Public Subnets
-resource "aws_subnet_network_acl_association" "public_nacl_association" {
+resource "aws_network_acl_association" "public_nacl_association" {
   count           = 4
   subnet_id       = aws_subnet.app_public_subnets[count.index].id
   network_acl_id  = aws_network_acl.main.id
