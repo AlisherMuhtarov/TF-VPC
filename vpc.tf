@@ -122,6 +122,7 @@ resource "aws_network_acl_association" "public_nacl_association" {
 
 # Create a NAT Gateway
 resource "aws_nat_gateway" "app_nat_gateway" {
+  count = 1
   subnet_id     = aws_subnet.app_public_subnets[0].id # Associate it with one of the public subnets
   tags = {
     Name = "app-natgateway1"
@@ -130,7 +131,7 @@ resource "aws_nat_gateway" "app_nat_gateway" {
 
 resource "aws_network_acl" "priv" {
   vpc_id = aws_vpc.main.id
-  subnet_ids = [aws_subnet.private_subnets.id]
+  subnet_ids = [aws_subnet.private_subnets[count.index].id]
 
   # Inbound Rules
   ingress {
