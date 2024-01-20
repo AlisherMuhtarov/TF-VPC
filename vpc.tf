@@ -70,7 +70,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.priv_route.id
 }
 
-resource "aws_network_acl" "main" {
+resource "aws_network_acl" "pub" {
   vpc_id = aws_vpc.main.id
 
   for_each = aws_subnet.private_subnets
@@ -122,11 +122,11 @@ resource "aws_network_acl_association" "public_nacl_association" {
   for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
-  network_acl_id = aws_network_acl.main[each.value.availability_zone].id
+  network_acl_id = aws_network_acl.pub[each.value.availability_zone].id
 }
 
 resource "aws_nat_gateway" "app_nat_gateway" {
-  for_each = aws_subnet.app_public_subnets
+  for_each = aws_subnet.private_subnets
 
   subnet_id     = each.value.id
   tags = {
