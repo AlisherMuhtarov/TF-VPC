@@ -45,11 +45,10 @@ resource "aws_route_table" "pub_route" {
 }
 
 resource "aws_route_table" "priv_route" {
-  count = 1
   vpc_id = aws_vpc.main.id
 
   route {
-    nat_gateway_id = aws_nat_gateway.app_nat_gateway[count.index].id
+    nat_gateway_id = aws_nat_gateway.app_nat_gateway.id
     cidr_block     = var.route_pub
   }
 
