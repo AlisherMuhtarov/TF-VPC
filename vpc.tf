@@ -3,18 +3,19 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "public_subnets" {
-  count = 4
-  vpc_id = aws_vpc.main.id
-  cidr_block = local.public_subnet_cidrs[count.index]
-  availability_zone = element(var.availability_zones, count.index)
+  for_each = { for idx, az in var.availability_zones : idx => az }
 
+  vpc_id           = aws_vpc.main.id
+  cidr_block       = local.public_subnet_cidrs[each.key]
+  availability_zone = each.value
 }
 
 resource "aws_subnet" "private_subnets" {
-  count = 4
-  vpc_id = aws_vpc.main.id
-  cidr_block = local.private_subnet_cidrs[count.index]
-  availability_zone = element(var.availability_zones, count.index)
+  for_each = { for idx, az in var.availability_zones : idx => az }
+
+  vpc_id           = aws_vpc.main.id
+  cidr_block       = local.private_subnet_cidrs[each.key]
+  availability_zone = each.value
 }
 
 resource "aws_internet_gateway" "gw" {
@@ -48,7 +49,7 @@ resource "aws_route_table" "priv_route" {
 
   route {
     nat_gateway_id = aws_nat_gateway.app_nat_gateway.id
-    cidr_block = var.route_pub
+    cidr_block     = var.route_pub
   }
   tags = {
     Name = "app-private-rt1"
@@ -56,19 +57,23 @@ resource "aws_route_table" "priv_route" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = 4
-  subnet_id      = aws_subnet.public_subnets[count.index].id
+  for_each = aws_subnet.public_subnets
+
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.pub_route.id
 }
 
 resource "aws_route_table_association" "private" {
-  count = 4
-  subnet_id      = aws_subnet.private_subnets[count.index].id
+  for_each = aws_subnet.private_subnets
+
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.priv_route.id
 }
 
 resource "aws_network_acl" "main" {
   vpc_id = aws_vpc.main.id
+
+  for_each = aws_subnet.private_subnets
 
   # Inbound Rules
   ingress {
@@ -113,26 +118,27 @@ resource "aws_network_acl" "main" {
   }
 }
 
-# Associate NACL with Public Subnets
 resource "aws_network_acl_association" "public_nacl_association" {
-  count = 4
-  subnet_id       = aws_subnet.public_subnets[count.index].id
-  network_acl_id  = aws_network_acl.main.id
+  for_each = aws_subnet.public_subnets
+
+  subnet_id      = each.value.id
+  network_acl_id = aws_network_acl.main[each.value.availability_zone].id
 }
 
-# Create a NAT Gateway
 resource "aws_nat_gateway" "app_nat_gateway" {
-  count = 1
-  subnet_id     = aws_subnet.app_public_subnets[0].id # Associate it with one of the public subnets
+  for_each = aws_subnet.app_public_subnets
+
+  subnet_id     = each.value.id
   tags = {
     Name = "app-natgateway1"
   } 
 }
 
 resource "aws_network_acl" "priv" {
-  count = 4
-  vpc_id = aws_vpc.main.id
-  subnet_ids = [aws_subnet.private_subnets[count.index].id]
+  for_each = aws_subnet.private_subnets
+
+  vpc_id      = aws_vpc.main.id
+  subnet_ids  = [each.value.id]
 
   # Inbound Rules
   ingress {
@@ -189,6 +195,5 @@ resource "aws_s3_bucket" "main" {
 resource "aws_flow_log" "example" {
   log_destination = aws_s3_bucket.main.id
   traffic_type    = "ALL"
-  vpc_id          = aws_vpc.main.id
+  vpc_id = aws_vpc.main.id
 }
-
