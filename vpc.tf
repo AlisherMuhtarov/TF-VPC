@@ -199,8 +199,8 @@ resource "aws_s3_bucket" "main" {
   }
 }
 
-resource "aws_flow_log" "example" {
-  log_destination = aws_s3_bucket.main.id
+resource "aws_flow_log" "main" {
+  log_destination = aws_s3_bucket.main.arn
   traffic_type    = "ALL"
   vpc_id = aws_vpc.main.id
 }
