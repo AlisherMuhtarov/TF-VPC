@@ -130,6 +130,7 @@ resource "aws_nat_gateway" "app_nat_gateway" {
 }
 
 resource "aws_network_acl" "priv" {
+  count = 4
   vpc_id = aws_vpc.main.id
   subnet_ids = [aws_subnet.private_subnets[count.index].id]
 
