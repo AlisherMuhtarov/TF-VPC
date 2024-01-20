@@ -48,7 +48,7 @@ resource "aws_route_table" "priv_route" {
   vpc_id = aws_vpc.main.id
 
   route {
-    nat_gateway_id = aws_nat_gateway.app_nat_gateway.id
+    nat_gateway_id = aws_nat_gateway.app_nat_gateway[0].id
     cidr_block     = var.route_pub
   }
 
