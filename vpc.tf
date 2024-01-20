@@ -70,8 +70,9 @@ resource "aws_route_table_association" "private" {
   for_each = aws_subnet.private_subnets
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.priv_route.id
+  route_table_id = aws_route_table.priv_route[each.key].id
 }
+
 
 resource "aws_network_acl" "pub" {
   vpc_id = aws_vpc.main.id
