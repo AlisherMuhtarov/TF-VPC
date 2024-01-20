@@ -57,13 +57,13 @@ resource "aws_route_table" "priv_route" {
 
 resource "aws_route_table_association" "public" {
   count = 4
-  subnet_id      = [aws_subnet.public_subnets[*].id]
+  subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.pub_route.id
 }
 
 resource "aws_route_table_association" "private" {
   count = 4
-  subnet_id      = [aws_subnet.private_subnets[*].id]
+  subnet_id      = aws_subnet.private_subnets[count.index].id
   route_table_id = aws_route_table.priv_route.id
 }
 
@@ -116,13 +116,13 @@ resource "aws_network_acl" "main" {
 # Associate NACL with Public Subnets
 resource "aws_network_acl_association" "public_nacl_association" {
   count = 4
-  subnet_id       = [aws_subnet.public_subnets[*].id]
+  subnet_id       = aws_subnet.public_subnets[count.index].id
   network_acl_id  = aws_network_acl.main.id
 }
 
 # Create a NAT Gateway
 resource "aws_nat_gateway" "app_nat_gateway" {
-  subnet_id     = [aws_subnet.app_public_subnets[0].id] # Associate it with one of the public subnets
+  subnet_id     = aws_subnet.app_public_subnets[0].id # Associate it with one of the public subnets
   tags = {
     Name = "app-natgateway1"
   } 
