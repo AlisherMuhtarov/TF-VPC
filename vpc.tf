@@ -129,9 +129,12 @@ resource "aws_network_acl_association" "public_nacl_association" {
   network_acl_id = aws_network_acl.pub[each.key].id
 }
 
+resource "aws_eip" "name" {
+}
+
 resource "aws_nat_gateway" "app_nat_gateway" {
   for_each = aws_subnet.private_subnets
-
+  allocation_id = aws_eip.name.id
   subnet_id     = each.value.id
   tags = {
     Name = "app-natgateway1"
