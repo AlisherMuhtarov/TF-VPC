@@ -126,7 +126,7 @@ resource "aws_network_acl_association" "public_nacl_association" {
   for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
-  network_acl_id = aws_network_acl.pub[each.value.availability_zone].id
+  network_acl_id = aws_network_acl.pub.id
 }
 
 resource "aws_nat_gateway" "app_nat_gateway" {
