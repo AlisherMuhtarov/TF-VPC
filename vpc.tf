@@ -59,11 +59,11 @@ resource "aws_route_table" "priv_route" {
   }
 }
 
-resource "aws_route_table_association" "public" {
+resource "aws_network_acl_association" "public_nacl_association" {
   for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.pub_route.id
+  network_acl_id = aws_network_acl.main[each.value.availability_zone].id
 }
 
 resource "aws_route_table_association" "private" {
