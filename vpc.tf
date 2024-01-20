@@ -45,7 +45,7 @@ resource "aws_route_table" "pub_route" {
 }
 
 resource "aws_route_table" "priv_route" {
-
+  count = 1
   vpc_id = aws_vpc.main.id
 
   route {
