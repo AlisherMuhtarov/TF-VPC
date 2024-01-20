@@ -131,9 +131,9 @@ resource "aws_eip" "name" {
 }
 
 resource "aws_nat_gateway" "app_nat_gateway" {
-  count = 1
+  for_each = aws_subnet.private_subnets
   allocation_id = aws_eip.name.id
-  subnet_id     = aws_subnet.public_subnets[0].id
+  subnet_id     = each.value.id
   tags = {
     Name = "app-natgateway1"
   } 
