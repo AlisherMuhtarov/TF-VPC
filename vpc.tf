@@ -45,6 +45,8 @@ resource "aws_route_table" "pub_route" {
 }
 
 resource "aws_route_table" "priv_route" {
+  for_each = aws_nat_gateway.app_nat_gateway
+
   vpc_id = aws_vpc.main.id
 
   route {
